@@ -32,7 +32,7 @@ classdef AudioEqualizer_exported < matlab.apps.AppBase
           gain double = [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1];
           b double
           a double
-          file_name string = 'Bach2.wav';
+          file_name string = 'audio.wav';
           Fs double = 44100;
           preampgain double = 0;
           f double = [0 43 44 87 88 176 177 354 355 709 710 1419 1420 2839 2840 5679 5680 11359 11360 22000]/(22000);
@@ -47,6 +47,12 @@ classdef AudioEqualizer_exported < matlab.apps.AppBase
         function plotfreq(app)
                [h,w] = freqz(app.b);
                semilogx(app.UIAxes, app.f * 22000,20*log10(app.gain),'--b',w/pi * 22000,20 * log10(abs(h)),'--r');
+               % plot impulse response
+%                [h,n]= impz(app.b,1);
+%                figure;
+%                hold on;
+%                plot(n,h)
+%                hold off;
        end
     end
     
@@ -168,6 +174,14 @@ classdef AudioEqualizer_exported < matlab.apps.AppBase
            [x,Fsampling]=audioread(app.file_name);
            y=filter(10^(app.preampgain/20)*app.b,1,x);   
            sound(y, Fsampling, 8);
+           
+           % plot FFT of signal
+           s = fft(x,16384);
+           sf = fft(y,16384); 
+           w = (0:255)/256*(app.Fs/2);
+           plot(w,abs([s(1:256)' sf(1:256)']));
+           
+           %soundsc(y, Fsampling, 8);
         end
 
         % Button pushed function: Preset1Button
